@@ -72,9 +72,11 @@ defmodule M2X.Client do
     status_range = div(status, 100)
     {:ok, body}  = engine.body(body_ref)
     headers      = Enum.into(header_list, %{})
-    {:ok, json}  = case headers["Content-Type"] do
-                     "application/json" -> JSON.decode(body)
-                     _                  -> {:ok, nil}
+    content_type = headers["Content-Type"]
+    is_json      = !!content_type and String.starts_with? content_type, "application/json"
+    {:ok, json}  = cond do
+                     is_json -> JSON.decode(body)
+                     true    -> {:ok, nil}
                    end
     %Response {
       raw:           body,

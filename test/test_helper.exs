@@ -54,7 +54,7 @@ defmodule MockEngine do
     client = client || state.client
     res_headers = Map.to_list(res_headers || %{})
     if res_params do
-      res_headers = [{"Content-Type", "application/json"}] ++ res_headers
+      res_headers = [{"Content-Type", "application/json; charset=UTF-8"}] ++ res_headers
     end
 
     {:reply, :ok, %State {

@@ -19,7 +19,7 @@ defmodule M2X.ClientTest do
     res = M2X.Client.get(subject, "/status")
 
     assert res.headers == Map.merge(res.headers, %{})
-    assert res.headers["Content-Type"] == "application/json"
+    assert res.headers["Content-Type"] == "application/json; charset=UTF-8"
     assert res.json == Map.merge(res.json, %{})
     assert res.json["api"]      == "OK"
     assert res.json["triggers"] == "OK"
@@ -38,7 +38,7 @@ defmodule M2X.ClientTest do
     res = M2X.Client.get(subject, "/status")
 
     assert res.headers == Map.merge(res.headers, %{})
-    assert res.headers["Content-Type"] == "application/json"
+    assert res.headers["Content-Type"] == "application/json; charset=UTF-8"
     assert res.json == Map.merge(res.json, %{})
     assert res.json["api"]      == "OK"
     assert res.json["triggers"] == "OK"
