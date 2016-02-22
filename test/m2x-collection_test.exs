@@ -92,11 +92,11 @@ defmodule M2X.CollectionTest do
     for list <- [list, list2] do
       for subject = %M2X.Collection{} <- list do
         assert subject.client == client
-        assert subject["name"] == "test"
+        assert subject.attrs["name"] == "test"
       end
-      assert Enum.at(list, 0)["id"] == "a"<>suffix
-      assert Enum.at(list, 1)["id"] == "b"<>suffix
-      assert Enum.at(list, 2)["id"] == "c"<>suffix
+      assert Enum.at(list, 0).attrs["id"] == "a"<>suffix
+      assert Enum.at(list, 1).attrs["id"] == "b"<>suffix
+      assert Enum.at(list, 2).attrs["id"] == "c"<>suffix
     end
   end
 

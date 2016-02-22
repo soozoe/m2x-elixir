@@ -26,14 +26,6 @@ defmodule M2X.SubresourceTest.Common do
         }
       end
 
-      test "attribute access" do
-        subject = %TheModule { attrs: test_attrs }
-
-        assert subject.attrs  == test_attrs
-        assert subject["foo"] == test_attrs["foo"]
-        assert subject["bar"] == test_attrs["bar"]
-      end
-
       test "refreshed" do
         subject = mock_subject \
           {:get, path, nil},

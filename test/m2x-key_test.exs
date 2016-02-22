@@ -46,11 +46,11 @@ defmodule M2X.KeyTest do
     for list <- [list, list2] do
       for subject = %M2X.Key{} <- list do
         assert subject.client == client
-        assert subject["name"] == "test"
+        assert subject.attrs["name"] == "test"
       end
-      assert Enum.at(list, 0)["key"] == "a"<>suffix
-      assert Enum.at(list, 1)["key"] == "b"<>suffix
-      assert Enum.at(list, 2)["key"] == "c"<>suffix
+      assert Enum.at(list, 0).attrs["key"] == "a"<>suffix
+      assert Enum.at(list, 1).attrs["key"] == "b"<>suffix
+      assert Enum.at(list, 2).attrs["key"] == "c"<>suffix
     end
   end
 

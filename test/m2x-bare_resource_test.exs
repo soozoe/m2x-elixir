@@ -11,12 +11,12 @@ defmodule M2X.BareResourceTest.Common do
           %{ "foo"=>88, "bar"=>"ninety-nine" }
       end
 
-      test "attribute access" do
-        subject = %TheModule { attrs: test_attrs }
+      test "has client and attrs" do
+        client  = %M2X.Client { }
+        subject = %TheModule { client: client, attrs: test_attrs }
 
+        assert subject.client == client
         assert subject.attrs  == test_attrs
-        assert subject["foo"] == test_attrs["foo"]
-        assert subject["bar"] == test_attrs["bar"]
       end
 
     end

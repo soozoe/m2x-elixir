@@ -77,11 +77,11 @@ defmodule M2X.DeviceTest do
     for list <- [list, search, catalog, list2, search2, catalog2] do
       for subject = %M2X.Device{} <- list do
         assert subject.client == client
-        assert subject["name"] == "test"
+        assert subject.attrs["name"] == "test"
       end
-      assert Enum.at(list, 0)["id"] == "a"<>suffix
-      assert Enum.at(list, 1)["id"] == "b"<>suffix
-      assert Enum.at(list, 2)["id"] == "c"<>suffix
+      assert Enum.at(list, 0).attrs["id"] == "a"<>suffix
+      assert Enum.at(list, 1).attrs["id"] == "b"<>suffix
+      assert Enum.at(list, 2).attrs["id"] == "c"<>suffix
     end
   end
 

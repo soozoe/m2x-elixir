@@ -14,18 +14,6 @@ defmodule M2X.Resource do
 
       alias __MODULE__, as: TheModule
 
-      # Implement Access protocol to delegate struct[key] to struct.attrs[key]
-      defimpl Access, for: TheModule do
-        def get(%TheModule { attrs: attrs }, key) do
-          Map.get(attrs, key)
-        end
-        def get_and_update(%TheModule { attrs: attrs }, key, fun) do
-          current_value = Map.get(attrs, key)
-          {get, update} = fun.(current_value)
-          {get, Map.put(key, update, attrs)}
-        end
-      end
-
       @main_path unquote(main_path)
 
       @doc """

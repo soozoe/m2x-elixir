@@ -23,14 +23,6 @@ defmodule M2X.ResourceTest.Common do
         }
       end
 
-      test "attribute access" do
-        subject = %TheModule { attrs: test_attrs }
-
-        assert subject.attrs  == test_attrs
-        assert subject["foo"] == test_attrs["foo"]
-        assert subject["bar"] == test_attrs["bar"]
-      end
-
       test "create!/1" do
         client = MockEngine.client \
           {:post, main_path, %{}},
