@@ -40,7 +40,7 @@ defmodule M2X.DeviceTest do
     client = MockEngine.client \
       {:get, "/v2/devices/"<>id, nil},
       {200, test_attributes, nil}
-    subject = M2X.Device.fetch(client, id)
+    {:ok, subject} = M2X.Device.fetch(client, id)
 
     %M2X.Device { } = subject
     assert subject.client == client
@@ -55,18 +55,24 @@ defmodule M2X.DeviceTest do
       %{ id: "b"<>suffix, name: "test", description: "bar" },
       %{ id: "c"<>suffix, name: "test", description: "baz" },
     ]}
-    client   = MockEngine.client({:get, "/v2/devices", nil}, {200, result, nil})
-    list     = M2X.Device.list(client)
-    client   = MockEngine.client({:get, "/v2/devices/search", nil}, {200, result, nil})
-    search   = M2X.Device.search(client)
-    client   = MockEngine.client({:get, "/v2/devices/catalog", nil}, {200, result, nil})
-    catalog  = M2X.Device.catalog(client)
-    client   = MockEngine.client({:get, "/v2/devices", params}, {200, result, nil})
-    list2    = M2X.Device.list(client, params)
-    client   = MockEngine.client({:get, "/v2/devices/search", params}, {200, result, nil})
-    search2  = M2X.Device.search(client, params)
-    client   = MockEngine.client({:get, "/v2/devices/catalog", params}, {200, result, nil})
-    catalog2 = M2X.Device.catalog(client, params)
+
+    client = MockEngine.client({:get, "/v2/devices", nil}, {200, result, nil})
+    {:ok, list} = M2X.Device.list(client)
+
+    client = MockEngine.client({:get, "/v2/devices/search", nil}, {200, result, nil})
+    {:ok, search} = M2X.Device.search(client)
+
+    client = MockEngine.client({:get, "/v2/devices/catalog", nil}, {200, result, nil})
+    {:ok, catalog} = M2X.Device.catalog(client)
+
+    client = MockEngine.client({:get, "/v2/devices", params}, {200, result, nil})
+    {:ok, list2} = M2X.Device.list(client, params)
+
+    client = MockEngine.client({:get, "/v2/devices/search", params}, {200, result, nil})
+    {:ok, search2} = M2X.Device.search(client, params)
+
+    client = MockEngine.client({:get, "/v2/devices/catalog", params}, {200, result, nil})
+    {:ok, catalog2} = M2X.Device.catalog(client, params)
 
     for list <- [list, search, catalog, list2, search2, catalog2] do
       for subject = %M2X.Device{} <- list do
@@ -84,7 +90,8 @@ defmodule M2X.DeviceTest do
       {:get, "/v2/devices/"<>id<>"/location", nil},
       {200, test_location, nil}
 
-    assert M2X.Device.get_location(subject).json == test_location
+    {:ok, res} = M2X.Device.get_location(subject)
+    assert res.json == test_location
   end
 
   test "location_history" do
@@ -93,8 +100,8 @@ defmodule M2X.DeviceTest do
       {:get, "/v2/devices/"<>id<>"/location/waypoints", params},
       {200, %{ "waypoints" => test_locations }, nil}
 
-    assert M2X.Device.location_history(subject, params).json == \
-      %{ "waypoints" => test_locations }
+    {:ok, res} = M2X.Device.location_history(subject, params)
+    assert res.json == %{ "waypoints" => test_locations }
   end
 
   test "update_location" do
@@ -102,7 +109,8 @@ defmodule M2X.DeviceTest do
       {:put, "/v2/devices/"<>id<>"/location", test_location},
       {202, nil, nil}
 
-    assert M2X.Device.update_location(subject, test_location).status == 202
+    {:ok, res} = M2X.Device.update_location(subject, test_location)
+    assert res.status == 202
   end
 
   test "metadata" do
@@ -110,7 +118,8 @@ defmodule M2X.DeviceTest do
       {:get, "/v2/devices/"<>id<>"/metadata", nil},
       {200, test_sub, nil}
 
-    assert M2X.Device.metadata(subject).json == test_sub
+    {:ok, res} = M2X.Device.metadata(subject)
+    assert res.json == test_sub
   end
 
   test "update_metadata" do
@@ -118,7 +127,8 @@ defmodule M2X.DeviceTest do
       {:put, "/v2/devices/"<>id<>"/metadata", test_sub},
       {202, nil, nil}
 
-    assert M2X.Device.update_metadata(subject, test_sub).status == 202
+    {:ok, res} = M2X.Device.update_metadata(subject, test_sub)
+    assert res.status == 202
   end
 
   test "get_metadata_field" do
@@ -126,7 +136,8 @@ defmodule M2X.DeviceTest do
       {:get, "/v2/devices/"<>id<>"/metadata/field_name", nil},
       {200, test_sub, nil}
 
-    assert M2X.Device.get_metadata_field(subject, "field_name").json == test_sub
+    {:ok, res} = M2X.Device.get_metadata_field(subject, "field_name")
+    assert res.json == test_sub
   end
 
   test "set_metadata_field" do
@@ -134,7 +145,8 @@ defmodule M2X.DeviceTest do
       {:put, "/v2/devices/"<>id<>"/metadata/field_name", %{ "value" => "field_value" }},
       {202, nil, nil}
 
-    assert M2X.Device.set_metadata_field(subject, "field_name", "field_value").status == 202
+    {:ok, res} = M2X.Device.set_metadata_field(subject, "field_name", "field_value")
+    assert res.status == 202
   end
 
   test "values" do
@@ -142,8 +154,8 @@ defmodule M2X.DeviceTest do
       {:get, "/v2/devices/"<>id<>"/values", test_attributes},
       {200, %{ "values" => test_sublist }, nil}
 
-    assert M2X.Device.values(subject, test_attributes).json == \
-      %{ "values" => test_sublist }
+    {:ok, res} = M2X.Device.values(subject, test_attributes)
+    assert res.json == %{ "values" => test_sublist }
   end
 
   test "values_search" do
@@ -151,8 +163,8 @@ defmodule M2X.DeviceTest do
       {:get, "/v2/devices/"<>id<>"/values/search", test_attributes},
       {200, %{ "values" => test_sublist }, nil}
 
-    assert M2X.Device.values_search(subject, test_attributes).json == \
-      %{ "values" => test_sublist }
+    {:ok, res} = M2X.Device.values_search(subject, test_attributes)
+    assert res.json == %{ "values" => test_sublist }
   end
 
   test "values_export_csv/1" do
@@ -160,7 +172,8 @@ defmodule M2X.DeviceTest do
       {:get, "/v2/devices/"<>id<>"/values/export.csv", %{}},
       {202, nil, nil}
 
-    assert M2X.Device.values_export_csv(subject).status == 202
+    {:ok, res} = M2X.Device.values_export_csv(subject)
+    assert res.status == 202
   end
 
   test "values_export_csv/2" do
@@ -168,7 +181,8 @@ defmodule M2X.DeviceTest do
       {:get, "/v2/devices/"<>id<>"/values/export.csv", test_attributes},
       {202, nil, nil}
 
-    assert M2X.Device.values_export_csv(subject, test_attributes).status == 202
+    {:ok, res} = M2X.Device.values_export_csv(subject, test_attributes)
+    assert res.status == 202
   end
 
   test "post_update" do
@@ -183,7 +197,8 @@ defmodule M2X.DeviceTest do
       {:post, "/v2/devices/"<>id<>"/update", params},
       {202, nil, nil}
 
-    assert M2X.Device.post_update(subject, params).status == 202
+    {:ok, res} = M2X.Device.post_update(subject, params)
+    assert res.status == 202
   end
 
   test "post_updates" do
@@ -201,7 +216,8 @@ defmodule M2X.DeviceTest do
       {:post, "/v2/devices/"<>id<>"/updates", params},
       {202, nil, nil}
 
-    assert M2X.Device.post_updates(subject, params).status == 202
+    {:ok, res} = M2X.Device.post_updates(subject, params)
+    assert res.status == 202
   end
 
   test "streams" do
@@ -209,7 +225,7 @@ defmodule M2X.DeviceTest do
       {:get, "/v2/devices/"<>id<>"/streams", nil},
       {200, %{ "streams"=>test_sublist }, nil}
 
-    streams = M2X.Device.streams(subject)
+    {:ok, streams} = M2X.Device.streams(subject)
 
     for stream = %M2X.Stream{} <- streams do
       assert stream.client == subject.client
@@ -225,7 +241,7 @@ defmodule M2X.DeviceTest do
       {:get, "/v2/devices/"<>id<>"/streams/"<>test_sub["name"], nil},
       {200, test_sub, nil}
 
-    stream = M2X.Device.stream(subject, test_sub["name"])
+    {:ok, stream} = M2X.Device.stream(subject, test_sub["name"])
 
     %M2X.Stream{} = stream
     assert stream.client == subject.client
@@ -238,12 +254,16 @@ defmodule M2X.DeviceTest do
     subject = mock_subject \
       {:put, "/v2/devices/"<>id<>"/streams/"<>test_sub["name"], update_attrs},
       {204, nil, nil}
-    assert M2X.Device.update_stream(subject, test_sub["name"], update_attrs).success?
+
+    {:ok, res} = M2X.Device.update_stream(subject, test_sub["name"], update_attrs)
+    assert res.status == 204
 
     subject = mock_subject \
       {:put, "/v2/devices/"<>id<>"/streams/"<>test_sub["name"], update_attrs},
       {204, nil, nil}
-    assert M2X.Device.create_stream(subject, test_sub["name"], update_attrs).success?
+
+    {:ok, res} = M2X.Device.create_stream(subject, test_sub["name"], update_attrs)
+    assert res.status == 204
   end
 
   test "commands" do
@@ -251,7 +271,7 @@ defmodule M2X.DeviceTest do
       {:get, "/v2/devices/"<>id<>"/commands", nil},
       {200, %{ "commands"=>test_sublist }, nil}
 
-    commands = M2X.Device.commands(subject)
+    {:ok, commands} = M2X.Device.commands(subject)
 
     for command = %M2X.Stream{} <- commands do
       assert command.client == subject.client
@@ -266,7 +286,7 @@ defmodule M2X.DeviceTest do
       {:get, "/v2/devices/"<>id<>"/commands/"<>test_sub["id"], nil},
       {200, test_sub, nil}
 
-    command = M2X.Device.command(subject, test_sub["id"])
+    {:ok, command} = M2X.Device.command(subject, test_sub["id"])
 
     %M2X.Command{} = command
     assert command.client == subject.client
@@ -280,7 +300,9 @@ defmodule M2X.DeviceTest do
       {202, nil, nil}
 
     command = %M2X.Command { attributes: test_sub }
-    assert M2X.Device.process_command(subject, command, params).status == 202
+
+    {:ok, res} = M2X.Device.process_command(subject, command, params)
+    assert res.status == 202
   end
 
   test "reject_command" do
@@ -290,7 +312,9 @@ defmodule M2X.DeviceTest do
       {202, nil, nil}
 
     command = %M2X.Command { attributes: test_sub }
-    assert M2X.Device.reject_command(subject, command, params).status == 202
+
+    {:ok, res} = M2X.Device.reject_command(subject, command, params)
+    assert res.status == 202
   end
 
 end

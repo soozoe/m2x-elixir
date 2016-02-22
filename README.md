@@ -28,39 +28,39 @@ The `M2X.Client` struct can be passed to functions that fetch existing remote re
 
 - [M2X.Device](lib/m2x/device.ex)
   ```elixir
-  device = M2X.Device.fetch(client, "<DEVICE-ID>")
-  #=> %M2X.Device { ... }
+  {:ok, device} = M2X.Device.fetch(client, "<DEVICE-ID>")
+  #=> {:ok, %M2X.Device { ... }}
   ```
 
 - [M2X.Distribution](lib/m2x/distribution.ex)
   ```elixir
-  distribution = M2X.Distribution.fetch(client, "<DISTRIBUTION-ID>")
-  #=> %M2X.Distribution { ... }
+  {:ok, distribution} = M2X.Distribution.fetch(client, "<DISTRIBUTION-ID>")
+  #=> {:ok, %M2X.Distribution { ... }}
   ```
 
 - [M2X.Collection](lib/m2x/collection.ex)
   ```elixir
-  collections = M2X.Collection.fetch(client, "<COLLECTION-ID>")
-  #=> %M2X.Collection { ... }
+  {:ok, collections} = M2X.Collection.fetch(client, "<COLLECTION-ID>")
+  #=> {:ok, %M2X.Collection { ... }}
   ```
 
 - [M2X.Key](lib/m2x/key.ex)
   ```elixir
-  key = M2X.Key.fetch(client, "<KEY-ID>")
-  #=> %M2X.Key { ... }
+  {:ok, key} = M2X.Key.fetch(client, "<KEY-ID>")
+  #=> {:ok, %M2X.Key { ... }}
   ```
 
 - [M2X.Job](lib/m2x/job.ex)
   ```elixir
-  key = M2X.Job.fetch(client, "<JOB-ID>")
-  #=> %M2X.Job { ... }
+  {:ok, key} = M2X.Job.fetch(client, "<JOB-ID>")
+  #=> {:ok, %M2X.Job { ... }}
   ```
 
 - [M2X.Stream](lib/m2x/stream.ex)
   ```elixir
-  device = M2X.Device.fetch(client, "<DEVICE-ID>")
-  stream = M2X.Device.stream(device, "<STREAM-NAME>")
-  #=> %M2X.Stream { ... }
+  {:ok, device} = M2X.Device.fetch(client, "<DEVICE-ID>")
+  {:ok, stream} = M2X.Device.stream(device, "<STREAM-NAME>")
+  #=> {:ok, %M2X.Stream { ... }}
   ```
 
 The `M2X.Client` struct can also be passed to REST methods to directly access any M2X API endpoint and get an `M2X.Client.Response` struct in return:
@@ -68,9 +68,11 @@ The `M2X.Client` struct can also be passed to REST methods to directly access an
 [M2X.Client.Response](lib/m2x/response.ex)
 ```elixir
 res = M2X.Client.get(client, "/some_path")
-#=> %M2X.Client.Response { ... }
+#=> {:ok, %M2X.Client.Response { ... }}
 res = M2X.Client.post(client, "/some/other_path", %{ "foo"=>"bar" })
-#=> %M2X.Client.Response { ... }
+#=> {:ok, %M2X.Client.Response { ... }}
+res = M2X.Client.get(client, "/some_unknown_path")
+#=> {:error, %M2X.Client.Response { ... }}
 ```
 
 ## Versioning

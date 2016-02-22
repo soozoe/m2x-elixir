@@ -25,7 +25,7 @@ defmodule M2X.CommandTest do
     client = MockEngine.client \
       {:get, "/v2/commands/"<>id, nil},
       {200, test_attributes, nil}
-    subject = M2X.Command.fetch(client, id)
+    {:ok, subject} = M2X.Command.fetch(client, id)
 
     %M2X.Command { } = subject
     assert subject.client == client
@@ -40,10 +40,12 @@ defmodule M2X.CommandTest do
       %{ id: "b"<>suffix, name: "foo" },
       %{ id: "c"<>suffix, name: "foo" },
     ]}
+
     client = MockEngine.client({:get, "/v2/commands", nil}, {200, result, nil})
-    list   = M2X.Command.list(client)
+    {:ok, list}  = M2X.Command.list(client)
+
     client = MockEngine.client({:get, "/v2/commands", params}, {200, result, nil})
-    list2  = M2X.Command.list(client, params)
+    {:ok, list2} = M2X.Command.list(client, params)
 
     for list <- [list, list2] do
       for subject = %M2X.Command{} <- list do
@@ -61,7 +63,7 @@ defmodule M2X.CommandTest do
     client = MockEngine.client \
       {:post, "/v2/commands", params},
       {200, test_attributes, %{ "Location" => main_url<>"/"<>id }}
-    subject = M2X.Command.send(client, params)
+    {:ok, subject} = M2X.Command.send(client, params)
 
     %M2X.Command { } = subject
     assert subject.client == client

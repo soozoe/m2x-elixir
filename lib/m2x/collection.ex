@@ -11,8 +11,10 @@ defmodule M2X.Collection do
     https://m2x.att.com/developer/documentation/v2/collections#View-Collection-Details
   """
   def fetch(client = %M2X.Client{}, id) do
-    res = M2X.Client.get(client, path(id))
-    res.success? and %M2X.Collection { client: client, attributes: res.json }
+    case M2X.Client.get(client, path(id)) do
+      {:ok, res} -> {:ok, %M2X.Collection { client: client, attributes: res.json }}
+      error_pair -> error_pair
+    end
   end
 
   @doc """
@@ -58,9 +60,13 @@ defmodule M2X.Collection do
     https://m2x.att.com/developer/documentation/v2/collections#List-collections
   """
   def list(client = %M2X.Client{}, params\\nil) do
-    res = M2X.Client.get(client, @main_path, params)
-    res.success? and Enum.map res.json["collections"], fn (attributes) ->
-      %M2X.Collection { client: client, attributes: attributes }
+    case M2X.Client.get(client, @main_path, params) do
+      {:ok, res} ->
+        list = Enum.map res.json["collections"], fn (attributes) ->
+          %M2X.Collection { client: client, attributes: attributes }
+        end
+        {:ok, list}
+      error_pair -> error_pair
     end
   end
 

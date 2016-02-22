@@ -34,42 +34,54 @@ defmodule M2X.StreamTest do
     subject = mock_subject \
       {:get, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/values", nil},
       {200, %{ "values" => test_list }, nil}
-    assert M2X.Stream.values(subject).json["values"] == test_list
+
+    {:ok, res} = M2X.Stream.values(subject)
+    assert res.json["values"] == test_list
   end
 
   test "values/2" do
     subject = mock_subject \
       {:get, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/values", test_attributes},
       {200, %{ "values" => test_list }, nil}
-    assert M2X.Stream.values(subject, test_attributes).json["values"] == test_list
+
+    {:ok, res} = M2X.Stream.values(subject, test_attributes)
+    assert res.json["values"] == test_list
   end
 
   test "sampling/1" do
     subject = mock_subject \
       {:get, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/sampling", nil},
       {200, %{ "sampling" => test_list }, nil}
-    assert M2X.Stream.sampling(subject).json["sampling"] == test_list
+
+    {:ok, res} = M2X.Stream.sampling(subject)
+    assert res.json["sampling"] == test_list
   end
 
   test "sampling/2" do
     subject = mock_subject \
       {:get, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/sampling", test_attributes},
       {200, %{ "sampling" => test_list }, nil}
-    assert M2X.Stream.sampling(subject, test_attributes).json["sampling"] == test_list
+
+    {:ok, res} = M2X.Stream.sampling(subject, test_attributes)
+    assert res.json["sampling"] == test_list
   end
 
   test "stats/1" do
     subject = mock_subject \
       {:get, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/stats", nil},
       {200, %{ "stats" => test_list }, nil}
-    assert M2X.Stream.stats(subject).json["stats"] == test_list
+
+    {:ok, res} = M2X.Stream.stats(subject)
+    assert res.json["stats"] == test_list
   end
 
   test "stats/2" do
     subject = mock_subject \
       {:get, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/stats", test_attributes},
       {200, %{ "stats" => test_list }, nil}
-    assert M2X.Stream.stats(subject, test_attributes).json["stats"] == test_list
+
+    {:ok, res} = M2X.Stream.stats(subject, test_attributes)
+    assert res.json["stats"] == test_list
   end
 
   test "update_value/1" do
@@ -77,7 +89,9 @@ defmodule M2X.StreamTest do
     subject = mock_subject \
       {:put, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/value", test_value_only},
       {202, nil, nil}
-    assert M2X.Stream.update_value(subject, value).success?
+
+    {:ok, res} = M2X.Stream.update_value(subject, value)
+    assert res.status == 202
   end
 
   test "update_value/2" do
@@ -85,14 +99,18 @@ defmodule M2X.StreamTest do
     subject = mock_subject \
       {:put, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/value", test_value_timed},
       {202, nil, nil}
-    assert M2X.Stream.update_value(subject, value, timestamp).success?
+
+    {:ok, res} = M2X.Stream.update_value(subject, value, timestamp)
+    assert res.status == 202
   end
 
   test "post_values" do
     subject = mock_subject \
       {:post, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/values", %{ "values"=>test_list }},
       {202, nil, nil}
-    assert M2X.Stream.post_values(subject, test_list).success?
+
+    {:ok, res} = M2X.Stream.post_values(subject, test_list)
+    assert res.status == 202
   end
 
   test "delete_values!" do
@@ -100,7 +118,9 @@ defmodule M2X.StreamTest do
     subject = mock_subject \
       {:delete, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/values", %{ "from"=>start, "end"=>stop }},
       {204, nil, nil}
-    assert M2X.Stream.delete_values!(subject, start, stop).success?
+
+    {:ok, res} = M2X.Stream.delete_values!(subject, start, stop)
+    assert res.status == 204
   end
 
 end

@@ -11,8 +11,10 @@ defmodule M2X.Distribution do
     https://m2x.att.com/developer/documentation/v2/distribution#View-Distribution-Details
   """
   def fetch(client = %M2X.Client{}, id) do
-    res = M2X.Client.get(client, path(id))
-    res.success? and %M2X.Distribution { client: client, attributes: res.json }
+    case M2X.Client.get(client, path(id)) do
+      {:ok, res} -> {:ok, %M2X.Distribution { client: client, attributes: res.json }}
+      error_pair -> error_pair
+    end
   end
 
   @doc """
@@ -58,9 +60,13 @@ defmodule M2X.Distribution do
     https://m2x.att.com/developer/documentation/v2/distribution#List-Search-Distributions
   """
   def list(client = %M2X.Client{}, params\\nil) do
-    res = M2X.Client.get(client, @main_path, params)
-    res.success? and Enum.map res.json["distributions"], fn (attributes) ->
-      %M2X.Distribution { client: client, attributes: attributes }
+    case M2X.Client.get(client, @main_path, params) do
+      {:ok, res} ->
+        list = Enum.map res.json["distributions"], fn (attributes) ->
+          %M2X.Distribution { client: client, attributes: attributes }
+        end
+        {:ok, list}
+      error_pair -> error_pair
     end
   end
 
@@ -70,9 +76,13 @@ defmodule M2X.Distribution do
     https://m2x.att.com/developer/documentation/v2/distribution#List-Devices-from-an-existing-Distribution
   """
   def devices(dist = %M2X.Distribution{ client: client }, params\\nil) do
-    res = M2X.Client.get(client, path(dist)<>"/devices", params)
-    res.success? and Enum.map res.json["devices"], fn (attributes) ->
-      %M2X.Device { client: client, attributes: attributes }
+    case M2X.Client.get(client, path(dist)<>"/devices", params) do
+      {:ok, res} ->
+        list = Enum.map res.json["devices"], fn (attributes) ->
+          %M2X.Device { client: client, attributes: attributes }
+        end
+        {:ok, list}
+      error_pair -> error_pair
     end
   end
 
@@ -83,8 +93,10 @@ defmodule M2X.Distribution do
   """
   def add_device(dist = %M2X.Distribution{ client: client }, serial) do
     params = %{ serial: serial }
-    res = M2X.Client.post(client, path(dist)<>"/devices", params)
-    res.success? and %M2X.Device { client: client, attributes: res.json }
+    case M2X.Client.post(client, path(dist)<>"/devices", params) do
+      {:ok, res} -> {:ok, %M2X.Device { client: client, attributes: res.json }}
+      error_pair -> error_pair
+    end
   end
 
 end

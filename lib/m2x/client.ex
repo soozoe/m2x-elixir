@@ -31,14 +31,10 @@ defmodule M2X.Client do
 
   defmodule Response do
     defstruct \
-      raw:           "",
-      json:          %{},
-      status:        0,
-      headers:       %{},
-      success?:      nil,
-      client_error?: nil,
-      server_error?: nil,
-      error?:        nil
+      raw:     "",
+      json:    %{},
+      status:  0,
+      headers: %{}
   end
 
   # Define REST methods for accessing the M2X API directly.
@@ -69,7 +65,6 @@ defmodule M2X.Client do
   end
 
   defp make_response(engine, {:ok, status, header_list, body_ref}) do
-    status_range = div(status, 100)
     {:ok, body}  = engine.body(body_ref)
     headers      = Enum.into(header_list, %{})
     content_type = headers["Content-Type"]
@@ -78,16 +73,18 @@ defmodule M2X.Client do
                      is_json -> JSON.decode(body)
                      true    -> {:ok, nil}
                    end
-    %Response {
-      raw:           body,
-      json:          json,
-      status:        status,
-      headers:       headers,
-      success?:      2 == status_range,
-      client_error?: 4 == status_range,
-      server_error?: 5 == status_range,
-      error?:        4 == status_range || 5 == status_range,
+
+    response = %Response {
+      raw:     body,
+      json:    json,
+      status:  status,
+      headers: headers,
     }
+
+    case div(status, 100) do
+      2 -> {:ok, response}
+      _ -> {:error, response}
+    end
   end
 
   defp make_body(nil, headers) do {"", headers} end

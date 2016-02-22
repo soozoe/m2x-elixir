@@ -21,9 +21,13 @@ defmodule M2X.Command do
     https://m2x.att.com/developer/documentation/v2/commands#List-Commands
   """
   def list(client = %M2X.Client{}, params\\nil) do
-    res = M2X.Client.get(client, @main_path, params)
-    res.success? and Enum.map res.json["commands"], fn (attributes) ->
-      %M2X.Command { client: client, attributes: attributes }
+    case M2X.Client.get(client, @main_path, params) do
+      {:ok, res} ->
+        list = Enum.map res.json["commands"], fn (attributes) ->
+          %M2X.Command { client: client, attributes: attributes }
+        end
+        {:ok, list}
+      error_pair -> error_pair
     end
   end
 
@@ -33,8 +37,10 @@ defmodule M2X.Command do
     https://m2x.att.com/developer/documentation/v2/commands#View-Command-Details
   """
   def fetch(client = %M2X.Client{}, id) do
-    res = M2X.Client.get(client, path(id))
-    res.success? and %M2X.Command { client: client, attributes: res.json }
+    case M2X.Client.get(client, path(id)) do
+      {:ok, res} -> {:ok, %M2X.Command { client: client, attributes: res.json }}
+      error_pair -> error_pair
+    end
   end
 
   @doc """
@@ -43,12 +49,13 @@ defmodule M2X.Command do
     https://m2x.att.com/developer/documentation/v2/commands#Send-Command
   """
   def send(client = %M2X.Client{}, params) do
-    res = M2X.Client.post(client, @main_path, params)
+    {:ok, res} = M2X.Client.post(client, @main_path, params)
+
     case Map.fetch(res.headers, "Location") do
       {:ok, location} ->
         uid = List.last(String.split(location, "/"))
-        %M2X.Command { client: client, attributes: %{ "id" => uid } }
-      _ -> false
+        {:ok, %M2X.Command { client: client, attributes: %{ "id" => uid } }}
+      _ -> {:error, res}
     end
   end
 

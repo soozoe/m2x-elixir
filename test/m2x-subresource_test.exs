@@ -39,7 +39,7 @@ defmodule M2X.SubresourceTest.Common do
           {:get, path, nil},
           {200, new_test_attributes, nil}
         assert subject.attributes == test_attributes
-        new_subject = TheModule.refreshed(subject)
+        {:ok, new_subject} = TheModule.refreshed(subject)
 
         %TheModule { } = new_subject
         assert new_subject.client == subject.client
@@ -50,14 +50,18 @@ defmodule M2X.SubresourceTest.Common do
         subject = mock_subject \
           {:put, path, new_test_attributes},
           {204, nil, nil}
-        assert TheModule.update!(subject, new_test_attributes).success?
+
+        {:ok, res} = TheModule.update!(subject, new_test_attributes)
+        assert res.status == 204
       end
 
       test "delete!" do
         subject = mock_subject \
           {:delete, path, nil},
           {204, nil, nil}
-        assert TheModule.delete!(subject).success?
+
+        {:ok, res} = TheModule.delete!(subject)
+        assert res.status == 204
       end
 
     end

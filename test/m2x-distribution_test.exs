@@ -31,7 +31,7 @@ defmodule M2X.DistributionTest do
     client = MockEngine.client \
       {:get, "/v2/distributions/"<>id, nil},
       {200, test_attributes, nil}
-    subject = M2X.Distribution.fetch(client, id)
+    {:ok, subject} = M2X.Distribution.fetch(client, id)
 
     %M2X.Distribution { } = subject
     assert subject.client == client
@@ -43,7 +43,8 @@ defmodule M2X.DistributionTest do
       {:get, "/v2/distributions/"<>id<>"/metadata", nil},
       {200, test_sub, nil}
 
-    assert M2X.Distribution.metadata(subject).json == test_sub
+    {:ok, res} = M2X.Distribution.metadata(subject)
+    assert res.json == test_sub
   end
 
   test "update_metadata" do
@@ -51,7 +52,8 @@ defmodule M2X.DistributionTest do
       {:put, "/v2/distributions/"<>id<>"/metadata", test_sub},
       {202, nil, nil}
 
-    assert M2X.Distribution.update_metadata(subject, test_sub).status == 202
+    {:ok, res} = M2X.Distribution.update_metadata(subject, test_sub)
+    assert res.status == 202
   end
 
   test "get_metadata_field" do
@@ -59,7 +61,8 @@ defmodule M2X.DistributionTest do
       {:get, "/v2/distributions/"<>id<>"/metadata/field_name", nil},
       {200, test_sub, nil}
 
-    assert M2X.Distribution.get_metadata_field(subject, "field_name").json == test_sub
+    {:ok, res} = M2X.Distribution.get_metadata_field(subject, "field_name")
+    assert res.json == test_sub
   end
 
   test "set_metadata_field" do
@@ -67,7 +70,8 @@ defmodule M2X.DistributionTest do
       {:put, "/v2/distributions/"<>id<>"/metadata/field_name", %{ "value" => "field_value" }},
       {202, nil, nil}
 
-    assert M2X.Distribution.set_metadata_field(subject, "field_name", "field_value").status == 202
+    {:ok, res} = M2X.Distribution.set_metadata_field(subject, "field_name", "field_value")
+    assert res.status == 202
   end
 
   test "list" do
@@ -78,10 +82,12 @@ defmodule M2X.DistributionTest do
       %{ id: "b"<>suffix, name: "test", description: "bar" },
       %{ id: "c"<>suffix, name: "test", description: "baz" },
     ]}
+
     client = MockEngine.client({:get, "/v2/distributions", nil}, {200, result, nil})
-    list   = M2X.Distribution.list(client)
+    {:ok, list} = M2X.Distribution.list(client)
+
     client = MockEngine.client({:get, "/v2/distributions", params}, {200, result, nil})
-    list2  = M2X.Distribution.list(client, params)
+    {:ok, list2} = M2X.Distribution.list(client, params)
 
     for list <- [list, list2] do
       for subject = %M2X.Distribution{} <- list do
@@ -102,10 +108,12 @@ defmodule M2X.DistributionTest do
       %{ id: "b"<>suffix, name: "test", description: "bar" },
       %{ id: "c"<>suffix, name: "test", description: "baz" },
     ]}
-    subject  = mock_subject {:get, "/v2/distributions/"<>id<>"/devices", nil}, {200, result, nil}
-    devices  = M2X.Distribution.devices(subject)
-    subject  = mock_subject {:get, "/v2/distributions/"<>id<>"/devices", params}, {200, result, nil}
-    devices2 = M2X.Distribution.devices(subject, params)
+
+    subject = mock_subject {:get, "/v2/distributions/"<>id<>"/devices", nil}, {200, result, nil}
+    {:ok, devices} = M2X.Distribution.devices(subject)
+
+    subject = mock_subject {:get, "/v2/distributions/"<>id<>"/devices", params}, {200, result, nil}
+    {:ok, devices2} = M2X.Distribution.devices(subject, params)
 
     for devices <- [devices, devices2] do
       for subject = %M2X.Device{} <- devices do
@@ -124,7 +132,7 @@ defmodule M2X.DistributionTest do
     subject = mock_subject \
       {:post, "/v2/distributions/"<>id<>"/devices", params},
       {200, test_attributes, nil}
-    device = M2X.Distribution.add_device(subject, serial)
+    {:ok, device} = M2X.Distribution.add_device(subject, serial)
 
     %M2X.Device { } = device
     assert device.client == subject.client

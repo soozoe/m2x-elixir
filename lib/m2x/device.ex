@@ -11,8 +11,10 @@ defmodule M2X.Device do
     https://m2x.att.com/developer/documentation/v2/device#View-Device-Details
   """
   def fetch(client = %M2X.Client{}, id) do
-    res = M2X.Client.get(client, path(id))
-    res.success? and %M2X.Device { client: client, attributes: res.json }
+    case M2X.Client.get(client, path(id)) do
+      {:ok, res} -> {:ok, %M2X.Device { client: client, attributes: res.json }}
+      error_pair -> error_pair
+    end
   end
 
   @doc """
@@ -21,9 +23,13 @@ defmodule M2X.Device do
     https://m2x.att.com/developer/documentation/v2/device#List-Devices
   """
   def list(client = %M2X.Client{}, params\\nil) do
-    res = M2X.Client.get(client, @main_path, params)
-    res.success? and Enum.map res.json["devices"], fn (attributes) ->
-      %M2X.Device { client: client, attributes: attributes }
+    case M2X.Client.get(client, @main_path, params) do
+      {:ok, res} ->
+        list = Enum.map res.json["devices"], fn (attributes) ->
+          %M2X.Device { client: client, attributes: attributes }
+        end
+        {:ok, list}
+      error_pair -> error_pair
     end
   end
 
@@ -34,9 +40,13 @@ defmodule M2X.Device do
     https://m2x.att.com/developer/documentation/v2/device#Search-Devices
   """
   def search(client = %M2X.Client{}, params\\nil) do
-    res = M2X.Client.get(client, @main_path<>"/search", params)
-    res.success? and Enum.map res.json["devices"], fn (attributes) ->
-      %M2X.Device { client: client, attributes: attributes }
+    case M2X.Client.get(client, @main_path<>"/search", params) do
+      {:ok, res} ->
+        list = Enum.map res.json["devices"], fn (attributes) ->
+          %M2X.Device { client: client, attributes: attributes }
+        end
+        {:ok, list}
+      error_pair -> error_pair
     end
   end
 
@@ -51,9 +61,13 @@ defmodule M2X.Device do
     https://m2x.att.com/developer/documentation/v2/device#List-Search-Public-Devices-Catalog
   """
   def catalog(client = %M2X.Client{}, params\\nil) do
-    res = M2X.Client.get(client, @main_path<>"/catalog", params)
-    res.success? and Enum.map res.json["devices"], fn (attributes) ->
-      %M2X.Device { client: client, attributes: attributes }
+    case M2X.Client.get(client, @main_path<>"/catalog", params) do
+      {:ok, res} ->
+        list = Enum.map res.json["devices"], fn (attributes) ->
+          %M2X.Device { client: client, attributes: attributes }
+        end
+        {:ok, list}
+      error_pair -> error_pair
     end
   end
 
@@ -179,9 +193,13 @@ defmodule M2X.Device do
     https://m2x.att.com/developer/documentation/v2/device#List-Data-Streams
   """
   def streams(device = %M2X.Device { client: client }) do
-    res = M2X.Client.get(client, path(device)<>"/streams")
-    res.success? and Enum.map res.json["streams"], fn (attributes) ->
-      %M2X.Stream { client: client, attributes: attributes, under: path(device) }
+    case M2X.Client.get(client, path(device)<>"/streams") do
+      {:ok, res} ->
+        list = Enum.map res.json["streams"], fn (attributes) ->
+          %M2X.Stream { client: client, attributes: attributes, under: path(device) }
+        end
+        {:ok, list}
+      error_pair -> error_pair
     end
   end
 
@@ -215,9 +233,13 @@ defmodule M2X.Device do
     https://m2x.att.com/developer/documentation/v2/commands#Device-s-List-of-Received-Commands
   """
   def commands(device = %M2X.Device { client: client }) do
-    res = M2X.Client.get(client, path(device)<>"/commands")
-    res.success? and Enum.map res.json["commands"], fn (attributes) ->
-      %M2X.Command { client: client, attributes: attributes }
+    case M2X.Client.get(client, path(device)<>"/commands") do
+      {:ok, res} ->
+        list = Enum.map res.json["commands"], fn (attributes) ->
+          %M2X.Command { client: client, attributes: attributes }
+        end
+        {:ok, list}
+      error_pair -> error_pair
     end
   end
 
@@ -227,8 +249,10 @@ defmodule M2X.Device do
     https://m2x.att.com/developer/documentation/v2/commands#Device-s-View-of-Command-Details
   """
   def command(device = %M2X.Device { client: client }, command_id) do
-    res = M2X.Client.get(client, path(device)<>"/commands/"<>command_id)
-    res.success? and %M2X.Command { client: client, attributes: res.json }
+    case M2X.Client.get(client, path(device)<>"/commands/"<>command_id) do
+      {:ok, res} -> {:ok, %M2X.Command { client: client, attributes: res.json }}
+      error_pair -> error_pair
+    end
   end
 
   @doc """

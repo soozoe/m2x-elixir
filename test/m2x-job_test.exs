@@ -21,7 +21,7 @@ defmodule M2X.JobTest do
     client = MockEngine.client \
       {:get, "/v2/jobs/"<>job, nil},
       {200, test_attributes, nil}
-    subject = M2X.Job.fetch(client, job)
+    {:ok, subject} = M2X.Job.fetch(client, job)
 
     %M2X.Job { } = subject
     assert subject.client == client

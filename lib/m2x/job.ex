@@ -21,8 +21,10 @@ defmodule M2X.Job do
     https://m2x.att.com/developer/documentation/v2/jobs#View-Job-Details
   """
   def fetch(client = %M2X.Client{}, job) do
-    res = M2X.Client.get(client, path(job))
-    res.success? and %M2X.Job { client: client, attributes: res.json }
+    case M2X.Client.get(client, path(job)) do
+      {:ok, res} -> {:ok, %M2X.Job { client: client, attributes: res.json }}
+      error_pair -> error_pair
+    end
   end
 
 end

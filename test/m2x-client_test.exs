@@ -16,18 +16,14 @@ defmodule M2X.ClientTest do
 
   test "get /status from real service (without mocking)" do
     subject = %M2X.Client { api_key: "0123456789abcdef0123456789abcdef" }
-    res = M2X.Client.get(subject, "/status")
+    {:ok, res} = M2X.Client.get(subject, "/status")
 
     assert res.headers == Map.merge(res.headers, %{})
     assert res.headers["Content-Type"] == "application/json; charset=UTF-8"
     assert res.json == Map.merge(res.json, %{})
     assert res.json["api"]      == "OK"
     assert res.json["triggers"] == "OK"
-    assert res.status        == 200
-    assert res.success?      == true
-    assert res.client_error? == false
-    assert res.server_error? == false
-    assert res.error?        == false
+    assert res.status           == 200
   end
 
   test "get /status from mock service" do
@@ -35,18 +31,29 @@ defmodule M2X.ClientTest do
       {:get, "/v2/status", nil},
       {200, %{ api: "OK", triggers: "OK" }, nil}
     )
-    res = M2X.Client.get(subject, "/status")
+    {:ok, res} = M2X.Client.get(subject, "/status")
 
     assert res.headers == Map.merge(res.headers, %{})
     assert res.headers["Content-Type"] == "application/json; charset=UTF-8"
     assert res.json == Map.merge(res.json, %{})
     assert res.json["api"]      == "OK"
     assert res.json["triggers"] == "OK"
-    assert res.status        == 200
-    assert res.success?      == true
-    assert res.client_error? == false
-    assert res.server_error? == false
-    assert res.error?        == false
+    assert res.status           == 200
+  end
+
+  test "get /status from mock service with error" do
+    subject = MockEngine.client(
+      {:get, "/v2/status", nil},
+      {503, %{ api: "DOWN", triggers: "DOWN" }, nil}
+    )
+    {:error, res} = M2X.Client.get(subject, "/status")
+
+    assert res.headers == Map.merge(res.headers, %{})
+    assert res.headers["Content-Type"] == "application/json; charset=UTF-8"
+    assert res.json == Map.merge(res.json, %{})
+    assert res.json["api"]      == "DOWN"
+    assert res.json["triggers"] == "DOWN"
+    assert res.status           == 503
   end
 
 end

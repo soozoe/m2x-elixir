@@ -31,7 +31,7 @@ defmodule M2X.CollectionTest do
     client = MockEngine.client \
       {:get, "/v2/collections/"<>id, nil},
       {200, test_attributes, nil}
-    subject = M2X.Collection.fetch(client, id)
+    {:ok, subject} = M2X.Collection.fetch(client, id)
 
     %M2X.Collection { } = subject
     assert subject.client == client
@@ -43,7 +43,8 @@ defmodule M2X.CollectionTest do
       {:get, "/v2/collections/"<>id<>"/metadata", nil},
       {200, test_sub, nil}
 
-    assert M2X.Collection.metadata(subject).json == test_sub
+    {:ok, res} = M2X.Collection.metadata(subject)
+    assert res.json == test_sub
   end
 
   test "update_metadata" do
@@ -51,7 +52,8 @@ defmodule M2X.CollectionTest do
       {:put, "/v2/collections/"<>id<>"/metadata", test_sub},
       {202, nil, nil}
 
-    assert M2X.Collection.update_metadata(subject, test_sub).status == 202
+    {:ok, res} = M2X.Collection.update_metadata(subject, test_sub)
+    assert res.status == 202
   end
 
   test "get_metadata_field" do
@@ -59,7 +61,8 @@ defmodule M2X.CollectionTest do
       {:get, "/v2/collections/"<>id<>"/metadata/field_name", nil},
       {200, test_sub, nil}
 
-    assert M2X.Collection.get_metadata_field(subject, "field_name").json == test_sub
+    {:ok, res} = M2X.Collection.get_metadata_field(subject, "field_name")
+    assert res.json == test_sub
   end
 
   test "set_metadata_field" do
@@ -67,7 +70,8 @@ defmodule M2X.CollectionTest do
       {:put, "/v2/collections/"<>id<>"/metadata/field_name", %{ "value" => "field_value" }},
       {202, nil, nil}
 
-    assert M2X.Collection.set_metadata_field(subject, "field_name", "field_value").status == 202
+    {:ok, res} = M2X.Collection.set_metadata_field(subject, "field_name", "field_value")
+    assert res.status == 202
   end
 
   test "list" do
@@ -78,10 +82,12 @@ defmodule M2X.CollectionTest do
       %{ id: "b"<>suffix, name: "test", description: "bar" },
       %{ id: "c"<>suffix, name: "test", description: "baz" },
     ]}
+
     client = MockEngine.client({:get, "/v2/collections", nil}, {200, result, nil})
-    list   = M2X.Collection.list(client)
+    {:ok, list}  = M2X.Collection.list(client)
+
     client = MockEngine.client({:get, "/v2/collections", params}, {200, result, nil})
-    list2  = M2X.Collection.list(client, params)
+    {:ok, list2} = M2X.Collection.list(client, params)
 
     for list <- [list, list2] do
       for subject = %M2X.Collection{} <- list do

@@ -44,8 +44,10 @@ defmodule M2X.Subresource do
         subresource struct with all attributes set to their latest values.
       """
       def refreshed(subresource = %TheModule { client: client }) do
-        res = M2X.Client.get(client, TheModule.path(subresource))
-        res.success? and %TheModule { subresource | attributes: res.json }
+        case M2X.Client.get(client, TheModule.path(subresource)) do
+          {:ok, res} -> {:ok, %TheModule { subresource | attributes: res.json }}
+          error_pair -> error_pair
+        end
       end
 
       @doc """
