@@ -8,12 +8,12 @@ defmodule M2X.SubresourceTest.Common do
       alias unquote(mod),   as: TheModule
       alias unquote(under), as: ParentModule
 
-      def test_attributes do
+      def test_attrs do
         Map.merge required_attrs,
           %{ "foo"=>88, "bar"=>"ninety-nine" }
       end
 
-      def new_test_attributes do
+      def new_test_attrs do
         Map.merge required_attrs,
           %{ "foo"=>99, "bar"=>"eighty-eight", "baz"=>true }
       end
@@ -21,37 +21,37 @@ defmodule M2X.SubresourceTest.Common do
       def mock_subject(request, response) do
         %TheModule {
           client: MockEngine.client(request, response),
-          attributes: test_attributes,
+          attrs: test_attrs,
           under: under_path
         }
       end
 
       test "attribute access" do
-        subject = %TheModule { attributes: test_attributes }
+        subject = %TheModule { attrs: test_attrs }
 
-        assert subject.attributes == test_attributes
-        assert subject["foo"]     == test_attributes["foo"]
-        assert subject["bar"]     == test_attributes["bar"]
+        assert subject.attrs  == test_attrs
+        assert subject["foo"] == test_attrs["foo"]
+        assert subject["bar"] == test_attrs["bar"]
       end
 
       test "refreshed" do
         subject = mock_subject \
           {:get, path, nil},
-          {200, new_test_attributes, nil}
-        assert subject.attributes == test_attributes
+          {200, new_test_attrs, nil}
+        assert subject.attrs == test_attrs
         {:ok, new_subject} = TheModule.refreshed(subject)
 
         %TheModule { } = new_subject
         assert new_subject.client == subject.client
-        assert new_subject.attributes == new_test_attributes
+        assert new_subject.attrs  == new_test_attrs
       end
 
       test "update!" do
         subject = mock_subject \
-          {:put, path, new_test_attributes},
+          {:put, path, new_test_attrs},
           {204, nil, nil}
 
-        {:ok, res} = TheModule.update!(subject, new_test_attributes)
+        {:ok, res} = TheModule.update!(subject, new_test_attrs)
         assert res.status == 204
       end
 

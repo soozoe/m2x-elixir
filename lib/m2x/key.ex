@@ -12,7 +12,7 @@ defmodule M2X.Key do
   """
   def fetch(client = %M2X.Client{}, key) do
     case M2X.Client.get(client, path(key)) do
-      {:ok, res} -> {:ok, %M2X.Key { client: client, attributes: res.json }}
+      {:ok, res} -> {:ok, %M2X.Key { client: client, attrs: res.json }}
       error_pair -> error_pair
     end
   end
@@ -26,8 +26,8 @@ defmodule M2X.Key do
   def list(client = %M2X.Client{}, params\\nil) do
     case M2X.Client.get(client, @main_path, params) do
       {:ok, res} ->
-        list = Enum.map res.json["keys"], fn (attributes) ->
-          %M2X.Key { client: client, attributes: attributes }
+        list = Enum.map res.json["keys"], fn (attrs) ->
+          %M2X.Key { client: client, attrs: attrs }
         end
         {:ok, list}
       error_pair -> error_pair
@@ -45,7 +45,7 @@ defmodule M2X.Key do
   """
   def regenerated(key = %M2X.Key { client: client }) do
     case M2X.Client.get(client, path(key)) do
-      {:ok, res} -> {:ok, %M2X.Key { key | attributes: res.json }}
+      {:ok, res} -> {:ok, %M2X.Key { key | attrs: res.json }}
       error_pair -> error_pair
     end
   end

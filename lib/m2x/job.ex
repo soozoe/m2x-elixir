@@ -8,7 +8,7 @@ defmodule M2X.Job do
   @doc """
     Return the API path of the Resource.
   """
-  def path(%M2X.Job { attributes: %{ :job => uid } }) do
+  def path(%M2X.Job { attrs: %{ :job => uid } }) do
     path(uid)
   end
   def path(uid) when is_binary(uid) do
@@ -22,7 +22,7 @@ defmodule M2X.Job do
   """
   def fetch(client = %M2X.Client{}, job) do
     case M2X.Client.get(client, path(job)) do
-      {:ok, res} -> {:ok, %M2X.Job { client: client, attributes: res.json }}
+      {:ok, res} -> {:ok, %M2X.Job { client: client, attrs: res.json }}
       error_pair -> error_pair
     end
   end

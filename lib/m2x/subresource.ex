@@ -10,20 +10,20 @@ defmodule M2X.Subresource do
     quote location: :keep do
       defstruct \
         client: nil,
-        attributes: %{},
+        attrs: %{},
         under: nil
 
       alias __MODULE__, as: TheModule
 
-      # Implement Access protocol to delegate struct[key] to struct.attributes[key]
+      # Implement Access protocol to delegate struct[key] to struct.attrs[key]
       defimpl Access, for: TheModule do
-        def get(%TheModule { attributes: attributes }, key) do
-          Map.get(attributes, key)
+        def get(%TheModule { attrs: attrs }, key) do
+          Map.get(attrs, key)
         end
-        def get_and_update(%TheModule { attributes: attributes }, key, fun) do
-          current_value = Map.get(attributes, key)
+        def get_and_update(%TheModule { attrs: attrs }, key, fun) do
+          current_value = Map.get(attrs, key)
           {get, update} = fun.(current_value)
-          {get, Map.put(key, update, attributes)}
+          {get, Map.put(key, update, attrs)}
         end
       end
 
@@ -32,7 +32,7 @@ defmodule M2X.Subresource do
       @doc """
         Return the API path of the Subresource.
       """
-      def path(%TheModule { under: under, attributes: %{ unquote(uid)=>uid } }) do
+      def path(%TheModule { under: under, attrs: %{ unquote(uid)=>uid } }) do
         path(under, uid)
       end
       def path(under, uid) when is_binary(under) and is_binary(uid) do
@@ -41,17 +41,17 @@ defmodule M2X.Subresource do
 
       @doc """
         Query the service and return a refreshed version of the same
-        subresource struct with all attributes set to their latest values.
+        subresource struct with all attrs set to their latest values.
       """
       def refreshed(subresource = %TheModule { client: client }) do
         case M2X.Client.get(client, TheModule.path(subresource)) do
-          {:ok, res} -> {:ok, %TheModule { subresource | attributes: res.json }}
+          {:ok, res} -> {:ok, %TheModule { subresource | attrs: res.json }}
           error_pair -> error_pair
         end
       end
 
       @doc """
-        Update the remote subresource using the given attributes.
+        Update the remote subresource using the given attrs.
       """
       def update!(subresource = %TheModule { client: client }, params) do
         M2X.Client.put(client, TheModule.path(subresource), params)

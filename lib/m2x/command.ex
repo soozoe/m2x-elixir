@@ -8,7 +8,7 @@ defmodule M2X.Command do
   @doc """
     Return the API path of the Command.
   """
-  def path(%M2X.Command { attributes: %{ "id" => uid } }) do
+  def path(%M2X.Command { attrs: %{ "id" => uid } }) do
     path(uid)
   end
   def path(uid) when is_binary(uid) do
@@ -23,8 +23,8 @@ defmodule M2X.Command do
   def list(client = %M2X.Client{}, params\\nil) do
     case M2X.Client.get(client, @main_path, params) do
       {:ok, res} ->
-        list = Enum.map res.json["commands"], fn (attributes) ->
-          %M2X.Command { client: client, attributes: attributes }
+        list = Enum.map res.json["commands"], fn (attrs) ->
+          %M2X.Command { client: client, attrs: attrs }
         end
         {:ok, list}
       error_pair -> error_pair
@@ -38,7 +38,7 @@ defmodule M2X.Command do
   """
   def fetch(client = %M2X.Client{}, id) do
     case M2X.Client.get(client, path(id)) do
-      {:ok, res} -> {:ok, %M2X.Command { client: client, attributes: res.json }}
+      {:ok, res} -> {:ok, %M2X.Command { client: client, attrs: res.json }}
       error_pair -> error_pair
     end
   end
@@ -54,7 +54,7 @@ defmodule M2X.Command do
     case Map.fetch(res.headers, "Location") do
       {:ok, location} ->
         uid = List.last(String.split(location, "/"))
-        {:ok, %M2X.Command { client: client, attributes: %{ "id" => uid } }}
+        {:ok, %M2X.Command { client: client, attrs: %{ "id" => uid } }}
       _ -> {:error, res}
     end
   end

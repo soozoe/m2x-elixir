@@ -5,7 +5,7 @@ defmodule M2X.DistributionTest do
   def mock_subject(request, response) do
     %M2X.Distribution {
       client: MockEngine.client(request, response),
-      attributes: test_attributes,
+      attrs: test_attrs,
     }
   end
 
@@ -13,7 +13,7 @@ defmodule M2X.DistributionTest do
     "0123456789abcdef0123456789abcdef"
   end
 
-  def test_attributes do
+  def test_attrs do
     %{ "id"=>id, "name"=>"test", "visibility"=>"public", "description"=>"foo" }
   end
 
@@ -30,12 +30,12 @@ defmodule M2X.DistributionTest do
   test "fetch" do
     client = MockEngine.client \
       {:get, "/v2/distributions/"<>id, nil},
-      {200, test_attributes, nil}
+      {200, test_attrs, nil}
     {:ok, subject} = M2X.Distribution.fetch(client, id)
 
     %M2X.Distribution { } = subject
     assert subject.client == client
-    assert subject.attributes == test_attributes
+    assert subject.attrs  == test_attrs
   end
 
   test "metadata" do
@@ -131,12 +131,12 @@ defmodule M2X.DistributionTest do
     params = %{ "serial"=>serial }
     subject = mock_subject \
       {:post, "/v2/distributions/"<>id<>"/devices", params},
-      {200, test_attributes, nil}
+      {200, test_attrs, nil}
     {:ok, device} = M2X.Distribution.add_device(subject, serial)
 
     %M2X.Device { } = device
     assert device.client == subject.client
-    assert device.attributes == test_attributes
+    assert device.attrs  == test_attrs
   end
 
 end
