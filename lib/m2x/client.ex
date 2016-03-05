@@ -1,6 +1,6 @@
 defmodule M2X.Client do
 
-  def version, do: "1.3.1"
+  def version, do: "2.0.0"
 
   @os_type    :os.type
   @os_version :os.version
