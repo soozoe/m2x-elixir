@@ -43,8 +43,10 @@ defmodule M2X.Resource do
         returning a struct with the attributes of the new resource.
       """
       def create!(client = %M2X.Client{}, params\\%{}) do
-        res = M2X.Client.post(client, @main_path, params)
-        res.success? and %TheModule { client: client, attributes: res.json }
+        case M2X.Client.post(client, @main_path, params) do
+          {:ok, res} -> {:ok, %TheModule { client: client, attributes: res.json }}
+          error_pair -> error_pair
+        end
       end
 
       @doc """
@@ -52,8 +54,10 @@ defmodule M2X.Resource do
         resource struct with all attributes set to their latest values.
       """
       def refreshed(resource = %TheModule { client: client }) do
-        res = M2X.Client.get(client, TheModule.path(resource))
-        res.success? and %TheModule { resource | attributes: res.json }
+        case M2X.Client.get(client, TheModule.path(resource)) do
+          {:ok, res} -> {:ok, %TheModule { resource | attributes: res.json }}
+          error_pair -> error_pair
+        end
       end
 
       @doc """

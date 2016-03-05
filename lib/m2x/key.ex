@@ -11,8 +11,10 @@ defmodule M2X.Key do
     https://m2x.att.com/developer/documentation/v2/keys#View-Key-Details
   """
   def fetch(client = %M2X.Client{}, key) do
-    res = M2X.Client.get(client, path(key))
-    res.success? and %M2X.Key { client: client, attributes: res.json }
+    case M2X.Client.get(client, path(key)) do
+      {:ok, res} -> {:ok, %M2X.Key { client: client, attributes: res.json }}
+      error_pair -> error_pair
+    end
   end
 
   @doc """
@@ -22,9 +24,13 @@ defmodule M2X.Key do
     https://m2x.att.com/developer/documentation/v2/keys#List-Keys
   """
   def list(client = %M2X.Client{}, params\\nil) do
-    res = M2X.Client.get(client, @main_path, params)
-    res.success? and Enum.map res.json["keys"], fn (attributes) ->
-      %M2X.Key { client: client, attributes: attributes }
+    case M2X.Client.get(client, @main_path, params) do
+      {:ok, res} ->
+        list = Enum.map res.json["keys"], fn (attributes) ->
+          %M2X.Key { client: client, attributes: attributes }
+        end
+        {:ok, list}
+      error_pair -> error_pair
     end
   end
 
@@ -38,8 +44,10 @@ defmodule M2X.Key do
     https://m2x.att.com/developer/documentation/v2/keys#Regenerate-Key
   """
   def regenerated(key = %M2X.Key { client: client }) do
-    res = M2X.Client.get(client, path(key))
-    res.success? and %M2X.Key { key | attributes: res.json }
+    case M2X.Client.get(client, path(key)) do
+      {:ok, res} -> {:ok, %M2X.Key { key | attributes: res.json }}
+      error_pair -> error_pair
+    end
   end
 
 end
