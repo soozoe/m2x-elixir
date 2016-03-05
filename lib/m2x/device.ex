@@ -12,7 +12,7 @@ defmodule M2X.Device do
   """
   def fetch(client = %M2X.Client{}, id) do
     case M2X.Client.get(client, path(id)) do
-      {:ok, res} -> {:ok, %M2X.Device { client: client, attributes: res.json }}
+      {:ok, res} -> {:ok, %M2X.Device { client: client, attrs: res.json }}
       error_pair -> error_pair
     end
   end
@@ -25,8 +25,8 @@ defmodule M2X.Device do
   def list(client = %M2X.Client{}, params\\nil) do
     case M2X.Client.get(client, @main_path, params) do
       {:ok, res} ->
-        list = Enum.map res.json["devices"], fn (attributes) ->
-          %M2X.Device { client: client, attributes: attributes }
+        list = Enum.map res.json["devices"], fn (attrs) ->
+          %M2X.Device { client: client, attrs: attrs }
         end
         {:ok, list}
       error_pair -> error_pair
@@ -42,8 +42,8 @@ defmodule M2X.Device do
   def search(client = %M2X.Client{}, params\\nil) do
     case M2X.Client.get(client, @main_path<>"/search", params) do
       {:ok, res} ->
-        list = Enum.map res.json["devices"], fn (attributes) ->
-          %M2X.Device { client: client, attributes: attributes }
+        list = Enum.map res.json["devices"], fn (attrs) ->
+          %M2X.Device { client: client, attrs: attrs }
         end
         {:ok, list}
       error_pair -> error_pair
@@ -63,8 +63,8 @@ defmodule M2X.Device do
   def catalog(client = %M2X.Client{}, params\\nil) do
     case M2X.Client.get(client, @main_path<>"/catalog", params) do
       {:ok, res} ->
-        list = Enum.map res.json["devices"], fn (attributes) ->
-          %M2X.Device { client: client, attributes: attributes }
+        list = Enum.map res.json["devices"], fn (attrs) ->
+          %M2X.Device { client: client, attrs: attrs }
         end
         {:ok, list}
       error_pair -> error_pair
@@ -195,8 +195,8 @@ defmodule M2X.Device do
   def streams(device = %M2X.Device { client: client }) do
     case M2X.Client.get(client, path(device)<>"/streams") do
       {:ok, res} ->
-        list = Enum.map res.json["streams"], fn (attributes) ->
-          %M2X.Stream { client: client, attributes: attributes, under: path(device) }
+        list = Enum.map res.json["streams"], fn (attrs) ->
+          %M2X.Stream { client: client, attrs: attrs, under: path(device) }
         end
         {:ok, list}
       error_pair -> error_pair
@@ -210,7 +210,7 @@ defmodule M2X.Device do
   """
   def stream(device = %M2X.Device { client: client }, name) do
     M2X.Stream.refreshed %M2X.Stream {
-      client: client, under: path(device), attributes: %{ "name"=>name }
+      client: client, under: path(device), attrs: %{ "name"=>name }
     }
   end
 
@@ -222,7 +222,7 @@ defmodule M2X.Device do
   """
   def update_stream(device = %M2X.Device { client: client }, name, params) do
     M2X.Stream.update! %M2X.Stream {
-      client: client, under: path(device), attributes: %{ "name"=>name }
+      client: client, under: path(device), attrs: %{ "name"=>name }
     }, params
   end
   def create_stream(a,b,c) do update_stream(a,b,c) end # Alias
@@ -235,8 +235,8 @@ defmodule M2X.Device do
   def commands(device = %M2X.Device { client: client }) do
     case M2X.Client.get(client, path(device)<>"/commands") do
       {:ok, res} ->
-        list = Enum.map res.json["commands"], fn (attributes) ->
-          %M2X.Command { client: client, attributes: attributes }
+        list = Enum.map res.json["commands"], fn (attrs) ->
+          %M2X.Command { client: client, attrs: attrs }
         end
         {:ok, list}
       error_pair -> error_pair
@@ -250,7 +250,7 @@ defmodule M2X.Device do
   """
   def command(device = %M2X.Device { client: client }, command_id) do
     case M2X.Client.get(client, path(device)<>"/commands/"<>command_id) do
-      {:ok, res} -> {:ok, %M2X.Command { client: client, attributes: res.json }}
+      {:ok, res} -> {:ok, %M2X.Command { client: client, attrs: res.json }}
       error_pair -> error_pair
     end
   end
@@ -261,7 +261,7 @@ defmodule M2X.Device do
     https://m2x.att.com/developer/documentation/v2/commands#Device-Marks-a-Command-as-Processed
   """
   def process_command(device = %M2X.Device { client: client },
-                      %M2X.Command { attributes: %{ "id" => command_id } },
+                      %M2X.Command { attrs: %{ "id" => command_id } },
                       params\\%{}) do
     req_path = path(device)<>"/commands/"<>command_id<>"/process"
     M2X.Client.post(client, req_path, params)
@@ -273,7 +273,7 @@ defmodule M2X.Device do
     https://m2x.att.com/developer/documentation/v2/commands#Device-Marks-a-Command-as-Rejected
   """
   def reject_command(device = %M2X.Device { client: client },
-                     %M2X.Command { attributes: %{ "id" => command_id } },
+                     %M2X.Command { attrs: %{ "id" => command_id } },
                      params\\%{}) do
     req_path = path(device)<>"/commands/"<>command_id<>"/reject"
     M2X.Client.post(client, req_path, params)

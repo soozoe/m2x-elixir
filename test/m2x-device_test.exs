@@ -5,7 +5,7 @@ defmodule M2X.DeviceTest do
   def mock_subject(request, response) do
     %M2X.Device {
       client: MockEngine.client(request, response),
-      attributes: test_attributes,
+      attrs: test_attrs,
     }
   end
 
@@ -13,7 +13,7 @@ defmodule M2X.DeviceTest do
     "0123456789abcdef0123456789abcdef"
   end
 
-  def test_attributes do
+  def test_attrs do
     %{ "id"=>id, "name"=>"test", "visibility"=>"public", "description"=>"foo" }
   end
 
@@ -39,12 +39,12 @@ defmodule M2X.DeviceTest do
   test "fetch" do
     client = MockEngine.client \
       {:get, "/v2/devices/"<>id, nil},
-      {200, test_attributes, nil}
+      {200, test_attrs, nil}
     {:ok, subject} = M2X.Device.fetch(client, id)
 
     %M2X.Device { } = subject
     assert subject.client == client
-    assert subject.attributes == test_attributes
+    assert subject.attrs  == test_attrs
   end
 
   test "list, catalog" do
@@ -77,11 +77,11 @@ defmodule M2X.DeviceTest do
     for list <- [list, search, catalog, list2, search2, catalog2] do
       for subject = %M2X.Device{} <- list do
         assert subject.client == client
-        assert subject["name"] == "test"
+        assert subject.attrs["name"] == "test"
       end
-      assert Enum.at(list, 0)["id"] == "a"<>suffix
-      assert Enum.at(list, 1)["id"] == "b"<>suffix
-      assert Enum.at(list, 2)["id"] == "c"<>suffix
+      assert Enum.at(list, 0).attrs["id"] == "a"<>suffix
+      assert Enum.at(list, 1).attrs["id"] == "b"<>suffix
+      assert Enum.at(list, 2).attrs["id"] == "c"<>suffix
     end
   end
 
@@ -151,19 +151,19 @@ defmodule M2X.DeviceTest do
 
   test "values" do
     subject = mock_subject \
-      {:get, "/v2/devices/"<>id<>"/values", test_attributes},
+      {:get, "/v2/devices/"<>id<>"/values", test_attrs},
       {200, %{ "values" => test_sublist }, nil}
 
-    {:ok, res} = M2X.Device.values(subject, test_attributes)
+    {:ok, res} = M2X.Device.values(subject, test_attrs)
     assert res.json == %{ "values" => test_sublist }
   end
 
   test "values_search" do
     subject = mock_subject \
-      {:get, "/v2/devices/"<>id<>"/values/search", test_attributes},
+      {:get, "/v2/devices/"<>id<>"/values/search", test_attrs},
       {200, %{ "values" => test_sublist }, nil}
 
-    {:ok, res} = M2X.Device.values_search(subject, test_attributes)
+    {:ok, res} = M2X.Device.values_search(subject, test_attrs)
     assert res.json == %{ "values" => test_sublist }
   end
 
@@ -178,10 +178,10 @@ defmodule M2X.DeviceTest do
 
   test "values_export_csv/2" do
     subject = mock_subject \
-      {:get, "/v2/devices/"<>id<>"/values/export.csv", test_attributes},
+      {:get, "/v2/devices/"<>id<>"/values/export.csv", test_attrs},
       {202, nil, nil}
 
-    {:ok, res} = M2X.Device.values_export_csv(subject, test_attributes)
+    {:ok, res} = M2X.Device.values_export_csv(subject, test_attrs)
     assert res.status == 202
   end
 
@@ -231,9 +231,9 @@ defmodule M2X.DeviceTest do
       assert stream.client == subject.client
       assert stream.under == "/devices/"<>id
     end
-    assert Enum.at(streams, 0).attributes == Enum.at(test_sublist, 0)
-    assert Enum.at(streams, 1).attributes == Enum.at(test_sublist, 1)
-    assert Enum.at(streams, 2).attributes == Enum.at(test_sublist, 2)
+    assert Enum.at(streams, 0).attrs == Enum.at(test_sublist, 0)
+    assert Enum.at(streams, 1).attrs == Enum.at(test_sublist, 1)
+    assert Enum.at(streams, 2).attrs == Enum.at(test_sublist, 2)
   end
 
   test "stream" do
@@ -245,8 +245,8 @@ defmodule M2X.DeviceTest do
 
     %M2X.Stream{} = stream
     assert stream.client == subject.client
-    assert stream.under == "/devices/"<>id
-    assert stream.attributes == test_sub
+    assert stream.under  == "/devices/"<>id
+    assert stream.attrs  == test_sub
   end
 
   test "update_stream, create_stream" do
@@ -276,9 +276,9 @@ defmodule M2X.DeviceTest do
     for command = %M2X.Stream{} <- commands do
       assert command.client == subject.client
     end
-    assert Enum.at(commands, 0).attributes == Enum.at(test_sublist, 0)
-    assert Enum.at(commands, 1).attributes == Enum.at(test_sublist, 1)
-    assert Enum.at(commands, 2).attributes == Enum.at(test_sublist, 2)
+    assert Enum.at(commands, 0).attrs == Enum.at(test_sublist, 0)
+    assert Enum.at(commands, 1).attrs == Enum.at(test_sublist, 1)
+    assert Enum.at(commands, 2).attrs == Enum.at(test_sublist, 2)
   end
 
   test "command" do
@@ -290,7 +290,7 @@ defmodule M2X.DeviceTest do
 
     %M2X.Command{} = command
     assert command.client == subject.client
-    assert command.attributes == test_sub
+    assert command.attrs == test_sub
   end
 
   test "process_command" do
@@ -299,7 +299,7 @@ defmodule M2X.DeviceTest do
       {:post, "/v2/devices/"<>id<>"/commands/"<>test_sub["id"]<>"/process", params},
       {202, nil, nil}
 
-    command = %M2X.Command { attributes: test_sub }
+    command = %M2X.Command { attrs: test_sub }
 
     {:ok, res} = M2X.Device.process_command(subject, command, params)
     assert res.status == 202
@@ -311,7 +311,7 @@ defmodule M2X.DeviceTest do
       {:post, "/v2/devices/"<>id<>"/commands/"<>test_sub["id"]<>"/reject", params},
       {202, nil, nil}
 
-    command = %M2X.Command { attributes: test_sub }
+    command = %M2X.Command { attrs: test_sub }
 
     {:ok, res} = M2X.Device.reject_command(subject, command, params)
     assert res.status == 202

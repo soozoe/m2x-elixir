@@ -12,7 +12,7 @@ defmodule M2X.Collection do
   """
   def fetch(client = %M2X.Client{}, id) do
     case M2X.Client.get(client, path(id)) do
-      {:ok, res} -> {:ok, %M2X.Collection { client: client, attributes: res.json }}
+      {:ok, res} -> {:ok, %M2X.Collection { client: client, attrs: res.json }}
       error_pair -> error_pair
     end
   end
@@ -62,8 +62,8 @@ defmodule M2X.Collection do
   def list(client = %M2X.Client{}, params\\nil) do
     case M2X.Client.get(client, @main_path, params) do
       {:ok, res} ->
-        list = Enum.map res.json["collections"], fn (attributes) ->
-          %M2X.Collection { client: client, attributes: attributes }
+        list = Enum.map res.json["collections"], fn (attrs) ->
+          %M2X.Collection { client: client, attrs: attrs }
         end
         {:ok, list}
       error_pair -> error_pair

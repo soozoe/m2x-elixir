@@ -5,7 +5,7 @@ defmodule M2X.CollectionTest do
   def mock_subject(request, response) do
     %M2X.Collection {
       client: MockEngine.client(request, response),
-      attributes: test_attributes,
+      attrs: test_attrs,
     }
   end
 
@@ -13,7 +13,7 @@ defmodule M2X.CollectionTest do
     "0123456789abcdef0123456789abcdef"
   end
 
-  def test_attributes do
+  def test_attrs do
     %{ "id"=>id, "name"=>"test", "description"=>"foo" }
   end
 
@@ -30,12 +30,12 @@ defmodule M2X.CollectionTest do
   test "fetch" do
     client = MockEngine.client \
       {:get, "/v2/collections/"<>id, nil},
-      {200, test_attributes, nil}
+      {200, test_attrs, nil}
     {:ok, subject} = M2X.Collection.fetch(client, id)
 
     %M2X.Collection { } = subject
     assert subject.client == client
-    assert subject.attributes == test_attributes
+    assert subject.attrs == test_attrs
   end
 
   test "metadata" do
@@ -92,11 +92,11 @@ defmodule M2X.CollectionTest do
     for list <- [list, list2] do
       for subject = %M2X.Collection{} <- list do
         assert subject.client == client
-        assert subject["name"] == "test"
+        assert subject.attrs["name"] == "test"
       end
-      assert Enum.at(list, 0)["id"] == "a"<>suffix
-      assert Enum.at(list, 1)["id"] == "b"<>suffix
-      assert Enum.at(list, 2)["id"] == "c"<>suffix
+      assert Enum.at(list, 0).attrs["id"] == "a"<>suffix
+      assert Enum.at(list, 1).attrs["id"] == "b"<>suffix
+      assert Enum.at(list, 2).attrs["id"] == "c"<>suffix
     end
   end
 

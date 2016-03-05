@@ -10,28 +10,16 @@ defmodule M2X.Resource do
     quote location: :keep do
       defstruct \
         client: nil,
-        attributes: %{}
+        attrs: %{}
 
       alias __MODULE__, as: TheModule
-
-      # Implement Access protocol to delegate struct[key] to struct.attributes[key]
-      defimpl Access, for: TheModule do
-        def get(%TheModule { attributes: attributes }, key) do
-          Map.get(attributes, key)
-        end
-        def get_and_update(%TheModule { attributes: attributes }, key, fun) do
-          current_value = Map.get(attributes, key)
-          {get, update} = fun.(current_value)
-          {get, Map.put(key, update, attributes)}
-        end
-      end
 
       @main_path unquote(main_path)
 
       @doc """
         Return the API path of the Resource.
       """
-      def path(%TheModule { attributes: %{ unquote(uid)=>uid } }) do
+      def path(%TheModule { attrs: %{ unquote(uid)=>uid } }) do
         path(uid)
       end
       def path(uid) when is_binary(uid) do
@@ -40,28 +28,28 @@ defmodule M2X.Resource do
 
       @doc """
         Create a new resource using the given client and optional params,
-        returning a struct with the attributes of the new resource.
+        returning a struct with the attrs of the new resource.
       """
       def create!(client = %M2X.Client{}, params\\%{}) do
         case M2X.Client.post(client, @main_path, params) do
-          {:ok, res} -> {:ok, %TheModule { client: client, attributes: res.json }}
+          {:ok, res} -> {:ok, %TheModule { client: client, attrs: res.json }}
           error_pair -> error_pair
         end
       end
 
       @doc """
         Query the service and return a refreshed version of the same
-        resource struct with all attributes set to their latest values.
+        resource struct with all attrs set to their latest values.
       """
       def refreshed(resource = %TheModule { client: client }) do
         case M2X.Client.get(client, TheModule.path(resource)) do
-          {:ok, res} -> {:ok, %TheModule { resource | attributes: res.json }}
+          {:ok, res} -> {:ok, %TheModule { resource | attrs: res.json }}
           error_pair -> error_pair
         end
       end
 
       @doc """
-        Update the remote resource using the given attributes.
+        Update the remote resource using the given attrs.
       """
       def update!(resource = %TheModule { client: client }, params) do
         M2X.Client.put(client, TheModule.path(resource), params)

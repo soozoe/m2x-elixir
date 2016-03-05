@@ -9,21 +9,7 @@ defmodule M2X.BareResource do
     quote location: :keep do
       defstruct \
         client: nil,
-        attributes: %{}
-
-      alias __MODULE__, as: TheModule
-
-      # Implement Access protocol to delegate struct[key] to struct.attributes[key]
-      defimpl Access, for: TheModule do
-        def get(%TheModule { attributes: attributes }, key) do
-          Map.get(attributes, key)
-        end
-        def get_and_update(%TheModule { attributes: attributes }, key, fun) do
-          current_value = Map.get(attributes, key)
-          {get, update} = fun.(current_value)
-          {get, Map.put(key, update, attributes)}
-        end
-      end
+        attrs: %{}
 
       @main_path unquote(main_path)
 

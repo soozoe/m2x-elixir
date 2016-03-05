@@ -5,7 +5,7 @@ defmodule M2X.CommandTest do
   def mock_subject(request, response) do
     %M2X.Command {
       client: MockEngine.client(request, response),
-      attributes: test_attributes,
+      attrs: test_attrs,
     }
   end
 
@@ -17,19 +17,19 @@ defmodule M2X.CommandTest do
     "2015120123456789abcdef0123456789abcdef"
   end
 
-  def test_attributes do
+  def test_attrs do
     %{ "id"=>id, "name"=>"foo" }
   end
 
   test "fetch" do
     client = MockEngine.client \
       {:get, "/v2/commands/"<>id, nil},
-      {200, test_attributes, nil}
+      {200, test_attrs, nil}
     {:ok, subject} = M2X.Command.fetch(client, id)
 
     %M2X.Command { } = subject
     assert subject.client == client
-    assert subject.attributes == test_attributes
+    assert subject.attrs == test_attrs
   end
 
   test "list" do
@@ -50,11 +50,11 @@ defmodule M2X.CommandTest do
     for list <- [list, list2] do
       for subject = %M2X.Command{} <- list do
         assert subject.client == client
-        assert subject["name"] == "foo"
+        assert subject.attrs["name"] == "foo"
       end
-      assert Enum.at(list, 0)["id"] == "a"<>suffix
-      assert Enum.at(list, 1)["id"] == "b"<>suffix
-      assert Enum.at(list, 2)["id"] == "c"<>suffix
+      assert Enum.at(list, 0).attrs["id"] == "a"<>suffix
+      assert Enum.at(list, 1).attrs["id"] == "b"<>suffix
+      assert Enum.at(list, 2).attrs["id"] == "c"<>suffix
     end
   end
 
@@ -62,12 +62,12 @@ defmodule M2X.CommandTest do
     params = %{ name: "test" }
     client = MockEngine.client \
       {:post, "/v2/commands", params},
-      {200, test_attributes, %{ "Location" => main_url<>"/"<>id }}
+      {200, test_attrs, %{ "Location" => main_url<>"/"<>id }}
     {:ok, subject} = M2X.Command.send(client, params)
 
     %M2X.Command { } = subject
     assert subject.client == client
-    assert subject.attributes == %{ "id" => id }
+    assert subject.attrs  == %{ "id" => id }
   end
 
 end

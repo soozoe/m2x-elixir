@@ -5,14 +5,14 @@ defmodule M2X.StreamTest do
   def mock_subject(request, response) do
     %M2X.Stream {
       client: MockEngine.client(request, response),
-      attributes: test_attributes,
+      attrs: test_attrs,
       under: "/devices/"<>device_id,
     }
   end
 
-  def name            do "temperature"                         end
-  def device_id       do "0123456789abcdef0123456789abcdef"    end
-  def test_attributes do
+  def name       do "temperature"                         end
+  def device_id  do "0123456789abcdef0123456789abcdef"    end
+  def test_attrs do
     %{ "name"=>name, "type"=>"numeric" }
   end
 
@@ -41,10 +41,10 @@ defmodule M2X.StreamTest do
 
   test "values/2" do
     subject = mock_subject \
-      {:get, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/values", test_attributes},
+      {:get, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/values", test_attrs},
       {200, %{ "values" => test_list }, nil}
 
-    {:ok, res} = M2X.Stream.values(subject, test_attributes)
+    {:ok, res} = M2X.Stream.values(subject, test_attrs)
     assert res.json["values"] == test_list
   end
 
@@ -59,10 +59,10 @@ defmodule M2X.StreamTest do
 
   test "sampling/2" do
     subject = mock_subject \
-      {:get, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/sampling", test_attributes},
+      {:get, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/sampling", test_attrs},
       {200, %{ "sampling" => test_list }, nil}
 
-    {:ok, res} = M2X.Stream.sampling(subject, test_attributes)
+    {:ok, res} = M2X.Stream.sampling(subject, test_attrs)
     assert res.json["sampling"] == test_list
   end
 
@@ -77,10 +77,10 @@ defmodule M2X.StreamTest do
 
   test "stats/2" do
     subject = mock_subject \
-      {:get, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/stats", test_attributes},
+      {:get, "/v2/devices/"<>device_id<>"/streams/"<>name<>"/stats", test_attrs},
       {200, %{ "stats" => test_list }, nil}
 
-    {:ok, res} = M2X.Stream.stats(subject, test_attributes)
+    {:ok, res} = M2X.Stream.stats(subject, test_attrs)
     assert res.json["stats"] == test_list
   end
 
