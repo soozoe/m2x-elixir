@@ -12,6 +12,16 @@ Refer to the [Glossary of Terms](https://m2x.att.com/developer/documentation/glo
 2. Create your first [Device](https://m2x.att.com/devices) and copy its _Device ID_.
 3. Review the [M2X API Documentation](https://m2x.att.com/developer/documentation/overview).
 
+## Installation
+
+This library is available on [`hex.pm`](https://hex.pm/packages/m2x). To use it in your project, add `m2x` to your list of dependencies in `mix.exs`.
+
+```elixir
+def deps do
+  [{:m2x, "~> 2.0"}]
+end
+```
+
 ## Usage
 
 This library uses Elixir structs to contain data fetched from the AT&T M2X service, but these also contain all the data necessary to interact with the resource again, so they are used as convenience handles for deeper levels of the API.
