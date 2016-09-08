@@ -113,6 +113,16 @@ defmodule M2X.DeviceTest do
     assert res.status == 202
   end
 
+  test "delete_location_history" do
+    params = %{ "limit" => 2 }
+    subject = mock_subject \
+      {:delete, "/v2/devices/"<>id<>"/location/waypoints", params},
+      {204, nil, nil}
+
+    {:ok, res} = M2X.Device.delete_location_history(subject, params)
+    assert res.status == 204
+  end
+
   test "metadata" do
     subject = mock_subject \
       {:get, "/v2/devices/"<>id<>"/metadata", nil},

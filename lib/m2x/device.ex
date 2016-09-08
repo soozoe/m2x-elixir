@@ -102,6 +102,19 @@ defmodule M2X.Device do
   end
 
   @doc """
+    Delete location history of the specified d:evice.
+
+    https://m2x.att.com/developer/documentation/v2/device#Delete-Location-History
+  """
+  def delete_location_history(device = %M2X.Device { client: client }, params) do
+    M2X.Client.delete(client, path(device)<>"/location/waypoints", params)
+  end
+
+  def hello(device = %{client: client}) do
+    IO.puts "Hello Device #{inspect device}"
+  end
+
+  @doc """
     Get the custom metadata for the specified Device.
 
     https://m2x.att.com/developer/documentation/v2/device#Read-Device-Metadata
