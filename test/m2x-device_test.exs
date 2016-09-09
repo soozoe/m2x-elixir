@@ -95,7 +95,7 @@ defmodule M2X.DeviceTest do
   end
 
   test "location_history" do
-    params = %{ "limit" => 2 }
+    params = %{ :from => "2015-01-01T01:00:00.000Z", :end => "2015-01-01T01:00:00.000Z" }
     subject = mock_subject \
       {:get, "/v2/devices/"<>id<>"/location/waypoints", params},
       {200, %{ "waypoints" => test_locations }, nil}
@@ -111,6 +111,16 @@ defmodule M2X.DeviceTest do
 
     {:ok, res} = M2X.Device.update_location(subject, test_location)
     assert res.status == 202
+  end
+
+  test "delete_location_history" do
+    params = %{ "limit" => 2 }
+    subject = mock_subject \
+      {:delete, "/v2/devices/"<>id<>"/location/waypoints", params},
+      {204, nil, nil}
+
+    {:ok, res} = M2X.Device.delete_location_history(subject, params)
+    assert res.status == 204
   end
 
   test "metadata" do
