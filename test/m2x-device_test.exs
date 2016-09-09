@@ -95,7 +95,7 @@ defmodule M2X.DeviceTest do
   end
 
   test "location_history" do
-    params = %{ "limit" => 2 }
+    params = %{ :from => "2015-01-01T01:00:00.000Z", :end => "2015-01-01T01:00:00.000Z" }
     subject = mock_subject \
       {:get, "/v2/devices/"<>id<>"/location/waypoints", params},
       {200, %{ "waypoints" => test_locations }, nil}
