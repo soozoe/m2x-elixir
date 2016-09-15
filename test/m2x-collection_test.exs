@@ -100,4 +100,24 @@ defmodule M2X.CollectionTest do
     end
   end
 
+  test "add_device" do
+    device_id = "0123456789abcdef0123456789abcdef"
+    subject = mock_subject \
+      {:put, "/v2/collections/"<>id<>"/devices/"<>device_id, %{}},
+      {204, nil, nil}
+
+    {:ok, res} = M2X.Collection.add_device(subject, device_id, %{})
+    assert res.status == 204
+  end
+
+  test "remove_device" do
+    device_id = "0123456789abcdef0123456789abcdef"
+    subject = mock_subject \
+      {:delete, "/v2/collections/"<>id<>"/devices/"<>device_id, %{}},
+      {204, nil, nil}
+
+    {:ok, res} = M2X.Collection.remove_device(subject, device_id, %{})
+    assert res.status == 204
+  end
+
 end

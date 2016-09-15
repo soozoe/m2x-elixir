@@ -70,4 +70,22 @@ defmodule M2X.Collection do
     end
   end
 
+  @doc """
+    Add device to specified Collection.
+
+    https://m2x.att.com/developer/documentation/v2/collections#Add-device-to-collection
+  """
+  def add_device(coll = %M2X.Collection { client: client }, device_id, params) do
+    M2X.Client.put(client, path(coll)<>"/devices/"<>device_id, params)
+  end
+
+  @doc """
+    Remove device from secified Collection.
+
+    https://m2x.att.com/developer/documentation/v2/collections#Remove-device-from-collection
+  """
+  def remove_device(coll = %M2X.Collection { client: client }, device_id, params) do
+    M2X.Client.delete(client, path(coll)<>"/devices/"<>device_id, params)
+  end
+
 end
