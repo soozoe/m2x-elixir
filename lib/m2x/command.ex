@@ -1,7 +1,6 @@
 defmodule M2X.Command do
   @moduledoc """
-    Wrapper for the AT&T M2X Commands API.
-    https://m2x.att.com/developer/documentation/v2/jobs
+    Wrapper for the AT&T M2X <a href="https://m2x.att.com/developer/documentation/v2/commands"> Commands API </a>
   """
   use M2X.BareResource, path: {"/commands", :id}
 
@@ -16,9 +15,13 @@ defmodule M2X.Command do
   end
 
   @doc """
+    Method for <a href="https://m2x.att.com/developer/documentation/v2/commands#List-Commands">List Commands</a> endpoint.
+
     Retrieve the list of Commands accessible by the authenticated API key.
 
-    https://m2x.att.com/developer/documentation/v2/commands#List-Commands
+    - client: M2X.Client struct
+    - params: Query parameters passed as keyword arguments. View M2X API Docs for listing of available parameters
+    - Returns: List of Commands
   """
   def list(client = %M2X.Client{}, params\\nil) do
     case M2X.Client.get(client, @main_path, params) do
@@ -32,9 +35,14 @@ defmodule M2X.Command do
   end
 
   @doc """
+    Method for <a href="https://m2x.att.com/developer/documentation/v2/commands#View-Command-Details">View Command Details</a> endpoint.
+
     Retrieve a view of the Command associated with the given command id.
 
-    https://m2x.att.com/developer/documentation/v2/commands#View-Command-Details
+    - client: M2X.Client struct
+    - id: ID of the Command to retrieve
+    - Returns: The matching Command
+
   """
   def fetch(client = %M2X.Client{}, id) do
     case M2X.Client.get(client, path(id)) do
@@ -44,9 +52,13 @@ defmodule M2X.Command do
   end
 
   @doc """
+    Method for <a href="https://m2x.att.com/developer/documentation/v2/commands#Send-Command">Send Command</a> endpoint.
+
     Send a Command with the given name and data to the given targets.
 
-    https://m2x.att.com/developer/documentation/v2/commands#Send-Command
+    - client: M2X.Client struct
+    - params: Query parameters passed as keyword arguments. View M2X API Docs for listing of available parameters
+    - Returns: The Command that was just sent
   """
   def send(client = %M2X.Client{}, params) do
     {:ok, res} = M2X.Client.post(client, @main_path, params)

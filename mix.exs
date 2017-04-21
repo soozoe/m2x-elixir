@@ -15,8 +15,10 @@ defmodule M2X.Mixfile do
   def application do [] end
 
   defp dependencies do
-    [ hackney: "~> 1.0",
-      json:    "~> 0.3" ]
+    [ {:hackney, "~> 1.0"},
+      {:json,    "~> 0.3"},
+      {:earmark, "~> 0.1",  only: :dev, runtime: false},
+      {:ex_doc,  "~> 0.11", only: :dev, runtime: false} ]
   end
 
   defp description do

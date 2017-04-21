@@ -1,7 +1,6 @@
 defmodule M2X.Job do
   @moduledoc """
-    Wrapper for the AT&T M2X Jobs API.
-    https://m2x.att.com/developer/documentation/v2/jobs
+    Wrapper for the AT&T M2X <a href="https://m2x.att.com/developer/documentation/v2/jobs"> Jobs API </a>
   """
   use M2X.BareResource, path: {"/jobs", :job}
 
@@ -16,9 +15,13 @@ defmodule M2X.Job do
   end
 
   @doc """
+    Method for <a href="https://m2x.att.com/developer/documentation/v2/jobs#View-Job-Details">View Job Details</a> endpoint.
+
     Retrieve a view of the Job associated with the given unique job id.
 
-    https://m2x.att.com/developer/documentation/v2/jobs#View-Job-Details
+    - client: M2X.Client struct
+    - job: ID of the Job to retrieve
+    - Returns: The matching Job
   """
   def fetch(client = %M2X.Client{}, job) do
     case M2X.Client.get(client, path(job)) do
